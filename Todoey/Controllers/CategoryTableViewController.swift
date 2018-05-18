@@ -1,0 +1,127 @@
+//
+//  CategoryTableViewController.swift
+//  Todoey
+//
+//  Created by Katherine Choi on 4/27/18.
+//  Copyright © 2018 Katherine Choi. All rights reserved.
+//
+
+import UIKit
+import CoreData
+
+class CategoryTableViewController: UITableViewController {
+
+    
+    var categoryArray = [Category]()
+    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        
+        tableView.delegate = self
+        loadCategories()
+    }
+
+    //MARK: - TableView Datasource Methods
+    //MARK: - Tableview Delegate Methods
+    //TODO: - select row at index path  --> go to child item lists
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "goToItems", sender: self)
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // if there are multiple segues from this vc, could do if statements to identify which one is happening:
+        let destinationVC = segue.destination as! ToDoListViewController
+        
+        if let indexPath = tableView.indexPathForSelectedRow {
+            destinationVC.selectedCategory = categoryArray[indexPath.row]
+        }
+        
+    }
+    
+    //TODO: - number of rows in section
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return categoryArray.count
+    }
+    
+    
+    //TODO: - cell for row at index path
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        //DequeueReusableCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) //identifier created in prototype cell attributes panel in storyboard
+        
+        cell.textLabel?.text = categoryArray[indexPath.row].name
+        
+        return cell
+        
+        
+    }
+    
+
+    
+    
+
+    //MARK: - Data Manipulation Methods
+    
+    func saveCategories() {
+        do {
+            try context.save()
+        }
+        catch {
+            print("error saving context \(error)")
+        }
+        tableView.reloadData()
+    }
+    
+    func loadCategories(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
+        do {
+            categoryArray = try context.fetch(request)
+        }
+        catch {
+            print("error fetching data from context \(error)")
+        }
+        tableView.reloadData()
+    }
+    
+        
+        
+
+        
+    //MARK: - Add New Categories
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+
+
+    var textField = UITextField()
+    
+    let alert = UIAlertController(title: "Add New Category", message: "", preferredStyle: .alert)
+    
+    let action = UIAlertAction(title: "Add Category", style: .default) { (action) in
+        
+        let newCategory = Category(context: self.context)
+        newCategory.name = textField.text!
+        
+        self.categoryArray.append(newCategory)
+        self.saveCategories()
+        
+    
+    }
+
+    alert.addTextField { (alertTextField) in
+        alertTextField.placeholder = "Create new category"
+        textField = alertTextField  // extending the scope of the text field to the local add button pressed method to use in action
+    }
+
+    alert.addAction(action)
+    
+    present(alert, animated: true, completion: nil)
+
+
+    }
+    
+}
