@@ -106,6 +106,19 @@ class ToDoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print(todoItems![indexPath.row])
         
+        
+        if let item = todoItems?[indexPath.row] {
+            do {
+                try realm.write {
+//                realm.delete(item)
+                item.done = !item.done
+                }}
+            catch {
+                print("error saving done status, \(error)")
+            }
+        }
+        
+        
 //        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
 
@@ -116,7 +129,7 @@ class ToDoListViewController: UITableViewController {
 
 //        saveItems()
         
-//        tableView.reloadData()
+        tableView.reloadData()
         
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -148,6 +161,7 @@ class ToDoListViewController: UITableViewController {
                     try self.realm.write {
                     let newItem = Item()
                     newItem.title = textField.text!
+                    newItem.dateCreated = Date()
                     currentCategory.items.append(newItem)
                 }
                 } catch {

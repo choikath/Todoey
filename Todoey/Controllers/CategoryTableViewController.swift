@@ -15,7 +15,7 @@ class CategoryTableViewController: UITableViewController {
     
     var categoryArray : Results<Category>?
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     
     override func viewDidLoad() {
@@ -85,7 +85,7 @@ class CategoryTableViewController: UITableViewController {
     
     func loadCategories() {
 
-        let categoryArray = realm.objects(Category.self)
+        categoryArray = realm.objects(Category.self)
         
 //        let request:NSFetchRequest<Category> = Category.fetchRequest()
 //
